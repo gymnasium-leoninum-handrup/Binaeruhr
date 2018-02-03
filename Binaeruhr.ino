@@ -9,10 +9,12 @@
 #define rotaryS1 5
 
 #include <DS3231.h>
+#include "Rotary.hpp"
 
 DS3231 rtc(SDA, SCL);
 Time t;
 int sekunden;
+Rotary rotary(rotaryKey, rotaryS1, rotaryS2);
 
 const byte values[]=
   {
@@ -28,11 +30,6 @@ const byte values[]=
     0b01110111,  // 9
     0b10000000  //dp
   };
-
-bool getEncoderDirection()
-{
-  
-}
 
 void setTimeEncoder()
 {
@@ -79,16 +76,16 @@ void renderTimeDigit(int hours, int minutes, int seconds)
 {
   byte zeit[6];
 
-  zeit[1] = hours/10;
-  zeit[0] = hours%10;
+  zeit[0] = hours/10; // hours big
+  zeit[1] = hours%10; // hours small
 
-  zeit[3] = minutes/10;
-  zeit[2] = minutes%10;
+  zeit[2] = minutes/10; // minutes big
+  zeit[3] = minutes%10; // minutes small
 
-  zeit[5] = seconds/10;
-  zeit[4] = seconds%10;
-
-  for(int i = 0; i<6; i++)
+  zeit[4] = seconds/10; // seconds big
+  zeit[5] = seconds%10; // seconds small
+  
+  for(int i = 5; i>=0; i--)
   {
     shiftOut(dataPin, clockPin, MSBFIRST, values[zeit[i]]);
   }
@@ -100,7 +97,7 @@ void renderTimeDigit(int hours, int minutes, int seconds)
 void setup()
 {
     Serial.begin(9600);
-  
+    
     pinMode(latchPin, OUTPUT);
     pinMode(clockPin, OUTPUT);
     pinMode(dataPin, OUTPUT);
@@ -123,16 +120,14 @@ void loop()
      sekunden = t.sec;
 
     t = rtc.getTime();
-    Serial.println(t.hour);
-    Serial.println(t.min);
-    Serial.println(t.sec);
+    Serial.print(t.hour);
 
-    if(sekunden != t.sec)
+    if(sekunden != t.sec )
     {
-    renderTimeDigit(t.hour, t.min, t.sec);
+      renderTimeDigit(t.hour, t.min, t.sec);
     }
 
-    if(!digitalRead(rotaryKey))
+    if(rotary.buttonPressed())
     {
       setTimeEncoder();
     }
