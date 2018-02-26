@@ -8,6 +8,8 @@
 #define rotaryS2 6
 #define rotaryS1 5
 
+//‎A4 (SDA), A5 (SCL)
+
 #include <DS3231.h>
 #include "Rotary.hpp"
 
@@ -35,6 +37,7 @@ void setTimeEncoder()
 {
   int state = 0;
   int hour, minute, second;
+  hour = 0;
 
   Serial.println("Setting time...");
   for(int i = 0; i< 6; i++)
@@ -51,7 +54,16 @@ void setTimeEncoder()
     {
       case(0):
       {
-        
+        if(rotary.getTurn() == 1)
+        {
+          hour--;        
+        }
+        else if(rotary.getTurn() == 2)
+        {
+          hour++;        
+        }
+        Serial.print("setting: ");
+        Serial.println(hour);
         
         break;
       }
@@ -68,6 +80,11 @@ void setTimeEncoder()
         break;
       }
     }
+  }
+
+  if(rotary.buttonPressed())
+  {
+    state++;
   }
   rtc.setTime(hour, minute, second);
 }
@@ -92,6 +109,15 @@ void renderTimeDigit(int hours, int minutes, int seconds)
     digitalWrite(latchPin, LOW);
     digitalWrite(latchPin, HIGH);
   
+}
+
+void testDigit()
+{
+  for(int i = 0; i<=9; i++)
+  {
+    renderTimeDigit(i*10 + i, i*10 + i, i*10 + i);
+    delay(1000);
+  }
 }
 
 void setup()
@@ -120,16 +146,36 @@ void loop()
      sekunden = t.sec;
 
     t = rtc.getTime();
-    Serial.print(t.hour);
-
+   /* Serial.print(t.hour);
+    Serial.print(":");
+    Serial.print(t.min);
+    Serial.print(":");
+    Serial.print(t.sec);
+    Serial.println();*/
+    
     if(sekunden != t.sec )
     {
       renderTimeDigit(t.hour, t.min, t.sec);
     }
 
-    if(rotary.buttonPressed())
+    //if(rotary.buttonPressed())
     {
-      setTimeEncoder();
+      //testDigit();
+      //setTimeEncoder();
     }
+
+     if(rotary.buttonPressed())
+     {
+       int keyT = rotary.keyTime();
+       if(keyT> 0)
+      Serial.println(keyT);
+       if(keyT >= 2000)
+       {
+        setTimeEncoder();
+       }else
+       {
+             testDigit();
+        }
+     }
 }
 

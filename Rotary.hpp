@@ -32,6 +32,18 @@ public:
     else
       return false;
   }
+
+  int keyTime()
+  {
+    int count = 0;
+    while(buttonPressed())
+    {
+      count++;
+      delay(1);
+    }
+    return count;
+  }
+  
   int getTurn()
   {
     int result = 0;
