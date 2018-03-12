@@ -36,8 +36,7 @@ const byte values[]=
 void setTimeEncoder()
 {
   int state = 0;
-  int hour, minute, second;
-  hour = 0;
+  int hourBig, hourSmall, minuteBig, minuteSmall = 0;
 
   Serial.println("Setting time...");
   for(int i = 0; i< 6; i++)
@@ -54,39 +53,90 @@ void setTimeEncoder()
     {
       case(0):
       {
-        if(rotary.getTurn() == 1)
+        if(rotary.getTurn() == LEFT)
         {
-          hour--;        
+          hourBig--;        
         }
-        else if(rotary.getTurn() == 2)
+        else if(rotary.getTurn() == RIGHT)
         {
-          hour++;        
+          hourBig++;        
         }
-        Serial.print("setting: ");
-        Serial.println(hour);
-        
+        if(hourBig>2)
+          hourBig = 0;
+
+        if(hourBig < 0)
+          hourBig = 2;
         break;
       }
       case(1):
       {
+        if(rotary.getTurn() == LEFT)
+        {
+          hourSmall--;        
+        }
+        else if(rotary.getTurn() == RIGHT)
+        {
+          hourSmall++;        
+        }
+
+        if(hourBig == 2 && hourSmall> 3)
+          hourSmall = 0;
+
+        else if(hourSmall > 9)
+          hourSmall = 0;
+
+        else if(hourSmall < 0)
+          hourSmall = 9;
+        
         break;
       }
       case(2):
       {
+         if(rotary.getTurn() == LEFT)
+        {
+          minuteBig--;        
+        }
+        else if(rotary.getTurn() == RIGHT)
+        {
+          minuteBig++;        
+        }
+
+        if(minuteBig > 5)
+          minuteBig = 0;
+
+        if(minuteBig < 0)
+          minuteBig = 5;
+
         break;
       }
       case(3):
       {
+         if(rotary.getTurn() == LEFT)
+        {
+          minuteSmall--;        
+        }
+        else if(rotary.getTurn() == RIGHT)
+        {
+          minuteSmall++;        
+        }
+
+        if(minuteSmall > 9)
+          minuteSmall = 0;
+
+        if(minuteSmall < 0)
+          minuteSmall = 9;
         break;
       }
     }
+    
+    if(rotary.buttonPressed())
+    {
+      state++;
+      delay(1000);
+    }
+    renderTimeDigit(hourBig * 10 + hourSmall, minuteBig * 10 + minuteSmall, 0);
   }
-
-  if(rotary.buttonPressed())
-  {
-    state++;
-  }
-  rtc.setTime(hour, minute, second);
+  rtc.setTime(hourBig * 10 + hourSmall, minuteBig * 10 + minuteSmall, 0);
 }
 
 void renderTimeDigit(int hours, int minutes, int seconds)
