@@ -1,6 +1,11 @@
 #define latchPin 10
 #define clockPin 9
 #define dataPin 8
+
+#define dataBin 11
+#define clockBin 12
+#define latchBin 13
+
 #define RIGHT true
 #define LEFT false
 
@@ -161,6 +166,18 @@ void renderTimeDigit(int hours, int minutes, int seconds)
   
 }
 
+void renderTimeBin()
+{
+  for(int i = 0; i<128; i++)
+  {
+    shiftOut(dataBin, clockBin, MSBFIRST, i);
+    delay(200);
+    digitalWrite(latchBin, HIGH);
+    delay(100);
+    digitalWrite(latchBin, LOW);
+  }
+}
+
 void testDigit()
 {
   for(int i = 0; i<=9; i++)
@@ -177,6 +194,12 @@ void setup()
     pinMode(latchPin, OUTPUT);
     pinMode(clockPin, OUTPUT);
     pinMode(dataPin, OUTPUT);
+
+    
+    pinMode(latchBin, OUTPUT);
+    pinMode(clockBin, OUTPUT);
+    pinMode(dataBin, OUTPUT);
+    
     pinMode(rotaryKey, INPUT);
     pinMode(rotaryS1, INPUT);
     pinMode(rotaryS2, INPUT);
@@ -202,6 +225,8 @@ void loop()
     Serial.print(":");
     Serial.print(t.sec);
     Serial.println();*/
+
+    renderTimeBin();
     
     if(sekunden != t.sec )
     {
