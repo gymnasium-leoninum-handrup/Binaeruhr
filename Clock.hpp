@@ -24,4 +24,5 @@ public:
   void testClock();
   void setTimeEncoder(RotaryEncoder *rotary,DS3231 *rtc);
 };
+
 #endif
