@@ -47,7 +47,7 @@ void Clock::setTimeEncoder(RotaryEncoder *rotary, DS3231 *rtc)
 
   while(state < 4)
   {
-    int ergebnis = rotary->abfrage();
+    int ergebnis = rotary->poll();
     switch(state)
     {
       case(0):
@@ -69,11 +69,11 @@ void Clock::setTimeEncoder(RotaryEncoder *rotary, DS3231 *rtc)
       }
       case(1):
       {
-        if(rotary->abfrage() == LEFT)
+        if(ergebnis == LEFT)
         {
           hourSmall--;
         }
-        else if(rotary->abfrage() == RIGHT)
+        else if(ergebnis == RIGHT)
         {
           hourSmall++;
         }
@@ -91,11 +91,11 @@ void Clock::setTimeEncoder(RotaryEncoder *rotary, DS3231 *rtc)
       }
       case(2):
       {
-         if(rotary->abfrage() == LEFT)
+         if(ergebnis == LEFT)
         {
           minuteBig--;
         }
-        else if(rotary->abfrage() == RIGHT)
+        else if(ergebnis == RIGHT)
         {
           minuteBig++;
         }
@@ -110,11 +110,11 @@ void Clock::setTimeEncoder(RotaryEncoder *rotary, DS3231 *rtc)
       }
       case(3):
       {
-         if(rotary->abfrage() == LEFT)
+         if(ergebnis == LEFT)
         {
           minuteSmall--;
         }
-        else if(rotary->abfrage() == RIGHT)
+        else if(ergebnis == RIGHT)
         {
           minuteSmall++;
         }
@@ -127,10 +127,11 @@ void Clock::setTimeEncoder(RotaryEncoder *rotary, DS3231 *rtc)
         break;
       }
     }
-      if(rotary->gettaste() == 1)
+      if(rotary->getTaste() == 1)
       {
+        rotary->setCount(0);
         state++;
-       // delay(1000);
+        delay(100);
       }
       setTime(hourBig * 10 + hourSmall, minuteBig * 10 + minuteSmall, 0);
       render();

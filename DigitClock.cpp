@@ -34,10 +34,7 @@ void DigitClock::renderTimeDigit(int hours, int minutes, int seconds)
     shiftOut(dataPin, clockPin, MSBFIRST, values[zeit[i]]);
   }
     digitalWrite(latchPin, LOW);
-    delay(100);
     digitalWrite(latchPin, HIGH);
-    delay(100);
-
 }
 
 int DigitClock::getHours()

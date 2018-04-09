@@ -45,43 +45,21 @@ void setup()
 
 void loop()
 {
-   /* shiftOut(dataPin, clockPin, MSBFIRST, values[i]);
-    Serial.print("i: ");
-    Serial.print(i);
-    Serial.print(" ");
-    Serial.println(values[i], BIN);
-    digitalWrite(latchPin, LOW);
-    digitalWrite(latchPin, HIGH);*/
-
     sekunden = t.sec;
 
     t = rtc.getTime();
-    /*Serial.print(t.hour);
-    Serial.print(":");
-    Serial.print(t.min);
-    Serial.print(":");
-    Serial.print(t.sec);
-    Serial.println();*/
 
     if(sekunden != t.sec )
     {
-      Serial.println("Uhr setzen");
+      Serial.println("Uhr aktualisieren");
       clock.setTime(t.hour, t.min, t.sec);
       clock.render();
     }
 
-   /* if(rotary.buttonPressed())
-    {
-      //Serial.println("Testdigit");
-      testDigit();
-
-      setTimeEncoder();
-    }*/
-
-     int taste=rotary.gettaste();
+     int taste=rotary.getTaste();
   if (taste==1){
     Serial.println("kurzer Click");
-    rotary.setcount(0); 
+    rotary.setCount(0); 
     clock.testClock();
   }
   if (taste>1){
