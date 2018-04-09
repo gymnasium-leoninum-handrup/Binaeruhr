@@ -22,6 +22,6 @@ public:
   void setTime(int  hours, int minutes, int seconds);
   void render();
   void testClock();
-  void setTimeEncoder(Rotary *rotary,DS3231 *rtc);
+  void setTimeEncoder(RotaryEncoder *rotary,DS3231 *rtc);
 };
 #endif

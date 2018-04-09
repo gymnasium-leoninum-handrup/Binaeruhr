@@ -1,83 +1,118 @@
-#ifndef ROTARY_HPP
-#define ROTARY_HPP
+#ifndef __ROTARY
+#define __ROTARY
 
-#define RIGHT 1
-#define LEFT 2
-#define NONE 0
+// Reihenfolgen   Status
+// 11               0
+// 01               1
+// 00               2
+// 10   Rechts      3 mit Ausgabe
 
-class Rotary
-{
-private:
-    int aLastState = 0;
-    int aState = 0;
-    int keyButton;
-    int key1;
-    int key2;
+// 11               
+// 10               4
+// 00               5
+// 01               6
+// 11   Links       7  mit Ausgabe
 
-public:
-    Rotary(int keyButton, int key1, int key2)
-    {
-        this->keyButton = keyButton;
-        this->key1 = key1;
-        this->key2 = key2;
+#define Start 0
+#define R1    1
+#define R2    2
+#define R3    3
+#define L1    4
+#define L2    5
+#define L3    6
+#define rechts 8
+#define links 9
 
-        pinMode(keyButton, INPUT);
-        pinMode(key1, INPUT);
-        pinMode(key2, INPUT);
 
-        digitalWrite(keyButton, HIGH);
-        digitalWrite(key1, HIGH);
-        digitalWrite(key2, HIGH);
 
-        aLastState = digitalRead(this->key1);
+
+class RotaryEncoder
+{  private:
+  const byte Automat [4][7] = {
+  {Start, R2, R2, Start, L2, L2, Start},
+  {R1, R1, Start, Start, Start, L3, L3},
+  {L1, Start, R3, R3, L1, Start, Start},
+  {Start, Start, Start, rechts, Start, Start, links },
+  };
+     byte _vrp;
+     byte _arp;
+     char _ergebnis;
+     int _count;
+     byte _pinclk, _pindt, _pintast; 
+     byte _status;
+     byte _statustaste;
+   public:
+
+      RotaryEncoder(byte _Pinclk, byte _Pindt, byte _Pintast)
+      {
+          pinMode(_Pinclk,INPUT);
+          pinMode(_Pindt,INPUT);
+          pinMode(_Pintast, INPUT);
+          digitalWrite(_Pinclk,HIGH);
+          digitalWrite(_Pindt,HIGH);
+          digitalWrite(_Pintast,HIGH); 
+          _vrp=10;
+          _arp=11;
+          _ergebnis=0;
+          _count=0;
+          _pinclk=_Pinclk;
+          _pindt=_Pindt;
+          _pintast=_Pintast;
+          _status=0;
+          _statustaste=false;
+      }
+       
+       int abfrage(){
+       int _ergebnis;
+       _arp=(digitalRead(_pindt)<<1|digitalRead(_pinclk));
+       Serial.print("arp: ");
+       Serial.println(_arp);
+       if (!(_arp==_vrp)){
+        _vrp=_arp;
+        _status = Automat[_arp][_status];
+        Serial.println(_status);
+       switch (_status) {
+          case rechts: {
+                       _ergebnis=1;
+                       _status=0;
+                       _count++; 
+                        break;   }            
+         case links:  {_ergebnis=-1;
+                      _status=0;
+                      _count--;
+                      break;}
+               default: _ergebnis =0; 
+               }   
+        } 
+
+        Serial.println(_ergebnis);
+     return _ergebnis;        
+    }   
+
+   int getcount(){
+      return _count;
+   }
+
+   void setcount(byte count){
+      _count=count;
+   }
+
+   byte gettaste(){
+   byte _taste;
+   byte zaehle;
+   zaehle=0;
+   _taste=digitalRead(_pintast);
+   if (!(_taste==_statustaste)) {
+    zaehle=_statustaste;
+    _statustaste=_taste;
+    delay(500); //entprellen
+    while (digitalRead(_pintast)==LOW) {
+      zaehle++;
+      }
     }
-
-    bool buttonPressed()
-    {
-        if (digitalRead(keyButton) == LOW)
-            return true;
-        else
-            return false;
+    
+    return zaehle;
     }
-    int getTurn()
-    {
-        int result = 0;
-        aState = digitalRead(key1); // Reads the "current" state of the outputA
-        // If the previous and the current state of the outputA are different, that
-        // means a Pulse has occured
-        if (aState != aLastState && aState == LOW)
-        {
-            // If the outputB state is different to the outputA state, that means the
-            // encoder is rotating clockwise
-            if (digitalRead(key2) != aState)
-            {
-                result = 1;
-            }
-            else
-            {
-                result = 2;
-            }
-        }
-        else
-        {
-            result = 0;
-        }
-        aLastState = aState; // Updates the previous state of the outputA with the
-        // current state
+};        
 
-        return result;
-    }
-
-    int keyTime()
-    {
-        int count = 0;
-        while (buttonPressed())
-        {
-            count++;
-            delay(1);
-        }
-        return count;
-    }
-};
-
-#endif
+ #endif

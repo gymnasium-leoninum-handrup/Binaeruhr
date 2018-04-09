@@ -8,8 +8,8 @@
 #define clockBin 12
 #define latchBin 13
 
-#define RIGHT true
-#define LEFT false
+#define RIGHT 1
+#define LEFT -1
 
 #define rotaryKey 7
 #define rotaryS2 6
@@ -24,7 +24,7 @@ DS3231 rtc(SDA, SCL);
 Time t;
 Clock clock(dataPin, clockPin, latchPin, dataBin, clockBin, latchBin);
 int sekunden;
-Rotary rotary(rotaryKey, rotaryS1, rotaryS2);
+RotaryEncoder rotary(rotaryS1, rotaryS2, rotaryKey);
 
 void setup()
 {
@@ -40,7 +40,7 @@ void setup()
     pinMode(rotaryS2, INPUT);
     digitalWrite(rotaryKey,HIGH);
     rtc.begin();
-    clock.testClock();
+    //clock.testClock();
 }
 
 void loop()
@@ -78,18 +78,15 @@ void loop()
       setTimeEncoder();
     }*/
 
-     if(rotary.buttonPressed())
-     {
-       int keyT = rotary.keyTime();
-       if(keyT> 0)
-       Serial.println("longkey");
-       if(keyT >= 2000)
-       {
-        clock.setTimeEncoder(&rotary, &rtc);
-       }
-       else
-       {
-             clock.testClock();
-        }
-     }
+     int taste=rotary.gettaste();
+  if (taste==1){
+    Serial.println("kurzer Click");
+    rotary.setcount(0); 
+    clock.testClock();
+  }
+  if (taste>1){
+    Serial.println("Langer Click");
+    clock.setTimeEncoder(&rotary, &rtc);
+    
+}
 }

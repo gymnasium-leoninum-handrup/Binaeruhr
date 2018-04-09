@@ -1,5 +1,8 @@
 #include "Clock.hpp"
 
+#define RIGHT 1
+#define LEFT -1
+
 Clock::Clock(int dataPin, int clockPin, int latchPin, int dataPinBin, int clockPinBin, int latchPinBin)
   {
     this->digitClock = new DigitClock(dataPin, clockPin, latchPin);
@@ -34,26 +37,26 @@ void Clock::testClock()
   this->binClock->testDigitBin();
 }
 
-void Clock::setTimeEncoder(Rotary *rotary, DS3231 *rtc)
+void Clock::setTimeEncoder(RotaryEncoder *rotary, DS3231 *rtc)
 {
   int state = 0;
   int hourBig, hourSmall, minuteBig, minuteSmall = 0;
 
-  Serial.println("Setting time...");
   this->digitClock->renderDots();
 
 
   while(state < 4)
   {
+    int ergebnis = rotary->abfrage();
     switch(state)
     {
       case(0):
       {
-        if(rotary->getTurn() == LEFT)
+        if(ergebnis == LEFT)
         {
           hourBig--;
         }
-        else if(rotary->getTurn() == RIGHT)
+        else if(ergebnis == RIGHT)
         {
           hourBig++;
         }
@@ -66,11 +69,11 @@ void Clock::setTimeEncoder(Rotary *rotary, DS3231 *rtc)
       }
       case(1):
       {
-        if(rotary->getTurn() == LEFT)
+        if(rotary->abfrage() == LEFT)
         {
           hourSmall--;
         }
-        else if(rotary->getTurn() == RIGHT)
+        else if(rotary->abfrage() == RIGHT)
         {
           hourSmall++;
         }
@@ -88,11 +91,11 @@ void Clock::setTimeEncoder(Rotary *rotary, DS3231 *rtc)
       }
       case(2):
       {
-         if(rotary->getTurn() == LEFT)
+         if(rotary->abfrage() == LEFT)
         {
           minuteBig--;
         }
-        else if(rotary->getTurn() == RIGHT)
+        else if(rotary->abfrage() == RIGHT)
         {
           minuteBig++;
         }
@@ -107,11 +110,11 @@ void Clock::setTimeEncoder(Rotary *rotary, DS3231 *rtc)
       }
       case(3):
       {
-         if(rotary->getTurn() == LEFT)
+         if(rotary->abfrage() == LEFT)
         {
           minuteSmall--;
         }
-        else if(rotary->getTurn() == RIGHT)
+        else if(rotary->abfrage() == RIGHT)
         {
           minuteSmall++;
         }
@@ -124,10 +127,10 @@ void Clock::setTimeEncoder(Rotary *rotary, DS3231 *rtc)
         break;
       }
     }
-      if(rotary->buttonPressed())
+      if(rotary->gettaste() == 1)
       {
         state++;
-        delay(1000);
+       // delay(1000);
       }
       setTime(hourBig * 10 + hourSmall, minuteBig * 10 + minuteSmall, 0);
       render();
