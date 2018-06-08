@@ -1,12 +1,15 @@
 #include "Clock.hpp"
+#include "split.hpp"
 
 #define RIGHT 1
 #define LEFT -1
 
-Clock::Clock(int dataPin, int clockPin, int latchPin, int dataPinBin, int clockPinBin, int latchPinBin)
+Clock::Clock(int dataPin, int clockPin, int latchPin, int dataPinBin, int clockPinBin, int latchPinBin, int rx, int tx)
   {
     this->digitClock = new DigitClock(dataPin, clockPin, latchPin);
     this->binClock = new BinClock(dataPinBin, clockPinBin, latchPinBin);
+    this->esp = new SoftwareSerial(rx, tx);
+    this->esp->begin(57600);
   }
 
 Clock::~Clock()
@@ -20,6 +23,49 @@ void Clock::setTime(int hours, int minutes, int seconds)
   this->hours = hours;
   this->minutes = minutes;
   this->seconds = seconds;
+}
+
+int* Clock::getESPTime()
+{
+  int* times = new int[3];
+  
+  String ESPcmd[5] = 
+  {
+      "AT+CWMODE=1",
+      "AT+CWDHCP_CUR=1,1",
+      "AT+CWJAP_CUR=\"WlanOhneElan\",\"password42\"",
+      "AT+CIPSNTPCFG=1,2,\"0.de.pool.ntp.org\"",
+      "AT+CIPSNTPTIME?"
+  };
+
+    for(int i = 0; i<4; i++)
+    {
+        this->esp->println(ESPcmd[i]);
+        while(!esp->find("OK"));
+        Serial.println("Done!");
+    }
+
+    delay(50); // esp cooldown
+
+    esp->println("AT+CIPSNTPTIME?");
+    String x = esp->readStringUntil("OK");
+    Serial.println(x);
+
+    String* result = oe::splitme(oe::splitme(oe::splitme(x, "\r\n")[2], " ")[3], ":");
+
+    Serial.print("Stunden: ");
+    Serial.println(result[0]);
+    times[0] = result[0].toInt();
+
+    Serial.print("Minuten: ");
+    Serial.println(result[1]);
+    times[1] = result[1].toInt();
+
+    Serial.print("Sekunden: ");
+    Serial.println(result[2]);
+    times[2] = result[2].toInt();
+
+    return times;
 }
 
 void Clock::render()

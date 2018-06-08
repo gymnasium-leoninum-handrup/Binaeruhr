@@ -22,14 +22,15 @@
 
 DS3231 rtc(SDA, SCL);
 Time t;
-Clock clock(dataPin, clockPin, latchPin, dataBin, clockBin, latchBin);
+Clock clock(dataPin, clockPin, latchPin, dataBin, clockBin, latchBin, 10, 11);
 int sekunden;
 RotaryEncoder rotary(rotaryS1, rotaryS2, rotaryKey);
 
 void setup()
 {
     Serial.begin(9600);
-
+    Serial.println("OK");
+    int* result = clock.getESPTime();
 
     pinMode(latchBin, OUTPUT);
     pinMode(clockBin, OUTPUT);
@@ -38,9 +39,10 @@ void setup()
     pinMode(rotaryKey, INPUT);
     pinMode(rotaryS1, INPUT);
     pinMode(rotaryS2, INPUT);
-    digitalWrite(rotaryKey,HIGH);
+    digitalWrite(rotaryKey, HIGH);
     rtc.begin();
-    //clock.testClock();
+
+    // clock.testClock();
 }
 
 void loop()
@@ -49,22 +51,23 @@ void loop()
 
     t = rtc.getTime();
 
-    if(sekunden != t.sec )
+    if (sekunden != t.sec)
     {
-      Serial.println("Uhr aktualisieren");
-      clock.setTime(t.hour, t.min, t.sec);
-      clock.render();
+        Serial.println("Uhr aktualisieren");
+        clock.setTime(t.hour, t.min, t.sec);
+        clock.render();
     }
 
-     int taste=rotary.getTaste();
-  if (taste==1){
-    Serial.println("kurzer Click");
-    rotary.setCount(0); 
-    clock.testClock();
-  }
-  if (taste>1){
-    Serial.println("Langer Click");
-    clock.setTimeEncoder(&rotary, &rtc);
-    
-}
+    int taste = rotary.getTaste();
+    if (taste == 1)
+    {
+        Serial.println("kurzer Click");
+        rotary.setCount(0);
+        clock.testClock();
+    }
+    if (taste > 1)
+    {
+        Serial.println("Langer Click");
+        clock.setTimeEncoder(&rotary, &rtc);
+    }
 }

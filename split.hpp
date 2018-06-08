@@ -2,8 +2,8 @@
 #define __SPLIT_HPP
 
 #include "vector.hpp"
-
-String* split(String target, String split)
+namespace oe {
+String* splitme(String target, String split)
 {
     vector<String> arr;
 
@@ -38,6 +38,7 @@ String* split(String target, String split)
     }
 
     return result;
+}
 }
 
 #endif

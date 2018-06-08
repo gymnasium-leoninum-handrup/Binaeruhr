@@ -2,7 +2,8 @@
 /*
 *	Simple class for managing values with a dynamic array
 */
-
+#ifndef __VECTOR
+#define __VECTOR
 //BEGIN template class vector 
 template <class T> class vector
 {
@@ -128,5 +129,7 @@ private:
 	int size;	// size of vector
 };
 //END template class vector
+
+#endif
 
 

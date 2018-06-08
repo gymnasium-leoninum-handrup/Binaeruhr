@@ -6,6 +6,7 @@
 #include "BinClock.hpp"
 #include "Rotary.hpp"
 #include <DS3231.h>
+#include <SoftwareSerial.h>
 
 class Clock
 {
@@ -15,14 +16,16 @@ private:
   int seconds;
   DigitClock* digitClock;
   BinClock* binClock;
+  SoftwareSerial* esp;
 
 public:
-  Clock(int dataPin, int clockPin, int latchPin, int dataPinBin, int clockPinBin, int latchPinBin);
+  Clock(int dataPin, int clockPin, int latchPin, int dataPinBin, int clockPinBin, int latchPinBin, int rx, int tx);
   ~Clock();
   void setTime(int  hours, int minutes, int seconds);
   void render();
   void testClock();
   void setTimeEncoder(RotaryEncoder *rotary,DS3231 *rtc);
+  int* getESPTime();
 };
 
 #endif
