@@ -1,8 +1,6 @@
 #include "Clock.hpp"
 #include "split.hpp"
-
-#define RIGHT 1
-#define LEFT -1
+#include "Configuration.h"
 
 Clock::Clock(int dataPin, int clockPin, int latchPin, int dataPinBin, int clockPinBin, int latchPinBin, int rx, int tx)
   {
@@ -29,20 +27,28 @@ int* Clock::getESPTime()
 {
   int* times = new int[3];
   
-  String ESPcmd[5] = 
+  String ESPcmd[4] = 
   {
       "AT+CWMODE=1",
       "AT+CWDHCP_CUR=1,1",
-      "AT+CWJAP_CUR=\"WlanOhneElan\",\"password42\"",
-      "AT+CIPSNTPCFG=1,2,\"0.de.pool.ntp.org\"",
-      "AT+CIPSNTPTIME?"
+      "AT+CWJAP_CUR=\"" + String(WLAN) +"\",\"" + String(WLAN_PASSWORD) + "\"",
+      "AT+CIPSNTPCFG=1,2,\"" + String(NTP_SERVER) + "\""
   };
 
+    this->esp->setTimeout(ESP_TIMEOUT);
     for(int i = 0; i<4; i++)
     {
         this->esp->println(ESPcmd[i]);
-        while(!esp->find("OK"));
-        Serial.println("Done!");
+        if(esp->find("OK")) 
+        {
+          Serial.print(ESPcmd[i]);
+          Serial.println("Executed successfully");
+        }else //PANIC MODE
+        {
+          Serial.print(ESPcmd[i]);
+          Serial.println(" not worked. Please check ESP!");
+          return NULL; // Error :(
+        }
     }
 
     delay(50); // esp cooldown
