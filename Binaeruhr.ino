@@ -1,57 +1,47 @@
 #include "Clock.hpp"
-
-#define latchPin 10
-#define clockPin 9
-#define dataPin 8
-
-#define dataBin 11
-#define clockBin 12
-#define latchBin 13
-
-#define RIGHT 1
-#define LEFT -1
-
-#define rotaryKey 7
-#define rotaryS2 6
-#define rotaryS1 5
+#include "Configuration.h"
 
 //‎A4 (SDA), A5 (SCL)
 
-#include <DS3231.h>
+#include <DS3231.h> // real time clock lib
 #include "Rotary.hpp"
 
 DS3231 rtc(SDA, SCL);
 Time t;
-Clock clock(dataPin, clockPin, latchPin, dataBin, clockBin, latchBin, 10, 11);
-int sekunden;
-RotaryEncoder rotary(rotaryS1, rotaryS2, rotaryKey);
+int seconds;
+Clock clock(DATA_PIN, CLOCK_PIN, LATCH_PIN, DATA_BIN, CLOCK_BIN, LATCH_BIN, 10, 11);
+RotaryEncoder rotary(ROTARY_S1, ROTARY_S2, ROTARY_KEY);
 
 void setup()
 {
     Serial.begin(9600);
-    Serial.println("OK");
+    Serial.println("Serielle Verbindung hergestellt. Guten Tag!");
+    Serial.println("Initialisiere RTC...");
+    rtc.begin(); // init rtc connection
+    Serial.println("Versuche, Zeit vom Schulserver über ESP8266 zu lesen...");
     int* result = clock.getESPTime();
+    if(result == NULL)
+    {
+      Serial.println("Konnte Uhrzeit übers Schulnetz nicht lesen! Bitte ESP und/oder Schulserver prüfen!");
+    }else 
+    {
+      Serial.println("OK");
+      Serial.println("Setze RTC");
+      rtc.setTime(result[0], result[1], result[2]);
+    }
 
-    pinMode(latchBin, OUTPUT);
-    pinMode(clockBin, OUTPUT);
-    pinMode(dataBin, OUTPUT);
-
-    pinMode(rotaryKey, INPUT);
-    pinMode(rotaryS1, INPUT);
-    pinMode(rotaryS2, INPUT);
-    digitalWrite(rotaryKey, HIGH);
-    rtc.begin();
-
-    // clock.testClock();
+    Serial.println("Beginne mit Selbsttest... Bitte warten");
+    clock.testClock();
+    Serial.println("Selbsttest abgeschlossen");
 }
 
 void loop()
 {
-    sekunden = t.sec;
+    seconds = t.sec;
 
     t = rtc.getTime();
 
-    if (sekunden != t.sec)
+    if (seconds != t.sec)
     {
         Serial.println("Uhr aktualisieren");
         clock.setTime(t.hour, t.min, t.sec);
