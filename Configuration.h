@@ -1,11 +1,11 @@
 //WLAN and NTP Server
 
-#define WLAN "MYWLAN"
-#define WLAN_PASSWORD "password42"
-#define NTP_SERVER "0.de.pool.ntp.org"
+#define WLAN "WLAN am Leo"
+#define WLAN_PASSWORD "GymnasiumLeoninum"
+#define NTP_SERVER "10.16.1.1"
 
 //ESP Timeout (milliseconds)
-#define ESP_TIMEOUT 1000
+#define ESP_TIMEOUT 10000
 
 //Rotary directions
 #define RIGHT 1

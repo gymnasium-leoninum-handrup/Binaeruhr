@@ -32,7 +32,7 @@ int* Clock::getESPTime()
       "AT+CWMODE=1",
       "AT+CWDHCP_CUR=1,1",
       "AT+CWJAP_CUR=\"" + String(WLAN) +"\",\"" + String(WLAN_PASSWORD) + "\"",
-      "AT+CIPSNTPCFG=1,2,\"" + String(NTP_SERVER) + "\""
+      "AT+CIPSNTPCFG=1,1,\"" + String(NTP_SERVER) + "\""
   };
 
     this->esp->setTimeout(ESP_TIMEOUT);

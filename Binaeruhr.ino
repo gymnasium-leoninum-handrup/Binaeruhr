@@ -6,10 +6,26 @@
 #include <DS3231.h> // real time clock lib
 #include "Rotary.hpp"
 
+#define latchPin 10
+#define clockPin 9
+#define dataPin 8
+
+#define dataBin 11
+#define clockBin 12
+#define latchBin 13
+
+#define RIGHT 1
+#define LEFT -1
+
+#define rotaryKey 7
+#define rotaryS2 6
+#define rotaryS1 5
+
 DS3231 rtc(SDA, SCL);
 Time t;
 int seconds;
-Clock clock(DATA_PIN, CLOCK_PIN, LATCH_PIN, DATA_BIN, CLOCK_BIN, LATCH_BIN, 10, 11);
+//Clock clock(DATA_PIN, CLOCK_PIN, LATCH_PIN, DATA_BIN, CLOCK_BIN, LATCH_BIN, 10, 11);
+Clock clock(dataPin, clockPin, latchPin, dataBin, clockBin, latchBin, 2, 3);
 RotaryEncoder rotary(ROTARY_S1, ROTARY_S2, ROTARY_KEY);
 
 void setup()
