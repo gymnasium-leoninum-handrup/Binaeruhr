@@ -32,7 +32,7 @@ private:
   public:
     DigitClock(int dataPin, int clockPin, int latchPin);
     void testDigit();
-    void renderTimeDigit(int hours, int minutes, int seconds);
+    void renderTimeDigit(int hours, int minutes, int seconds, bool dots=false);
     int getHours();
     int getMinutes();
     int getSeconds();

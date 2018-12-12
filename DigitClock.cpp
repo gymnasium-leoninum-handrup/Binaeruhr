@@ -16,7 +16,7 @@ void DigitClock::testDigit()
   }
 }
 
-void DigitClock::renderTimeDigit(int hours, int minutes, int seconds)
+void DigitClock::renderTimeDigit(int hours, int minutes, int seconds, bool dots=false)
 {
   byte zeit[6];
 
@@ -31,7 +31,11 @@ void DigitClock::renderTimeDigit(int hours, int minutes, int seconds)
 
   for(int i = 5; i>=0; i--)
   {
+    if(dots) {
+    shiftOut(dataPin, clockPin, MSBFIRST, values[zeit[i]] | values[10]);  
+    }else {
     shiftOut(dataPin, clockPin, MSBFIRST, values[zeit[i]]);
+    }
   }
     digitalWrite(latchPin, LOW);
     digitalWrite(latchPin, HIGH);

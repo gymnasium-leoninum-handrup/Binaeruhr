@@ -74,12 +74,12 @@ int* Clock::getESPTime()
     return times;
 }
 
-void Clock::render()
+void Clock::render(bool dots = false)
 {
   this->digitClock->setTime(this->hours, this->minutes, this->seconds);
   //this->binClock->setTime(this->hours, this->minutes, this->seconds);
 
-  this->digitClock->renderTimeDigit(this->hours, this->minutes, this->seconds);
+  this->digitClock->renderTimeDigit(this->hours, this->minutes, this->seconds, dots);
   this->binClock->renderTimeBin(this->hours, this->minutes, this->seconds);
 }
 
