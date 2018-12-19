@@ -30,24 +30,20 @@ bool synced = false;
 Clock clock(dataPin, clockPin, latchPin, dataBin, clockBin, latchBin, 2, 3);
 RotaryEncoder rotary(ROTARY_S1, ROTARY_S2, ROTARY_KEY);
 
+#define DIMENSION 3
+int greenTime[DIMENSION][4] = {
+  {12, 12, 12, 13},
+  {13,3, 13,28 },
+  {13, 32, 13, 33}
+};
+
 void setup()
 {
+    pinMode(4, OUTPUT);
     Serial.begin(9600);
     Serial.println("Serielle Verbindung hergestellt. Guten Tag!");
     Serial.println("Initialisiere RTC...");
     rtc.begin(); // init rtc connection
-   // Serial.println("Versuche, Zeit vom Schulserver über ESP8266 zu lesen...");
-   /* int* result = clock.getESPTime();
-    if(result == NULL)
-    {
-      Serial.println("Konnte Uhrzeit übers Schulnetz nicht lesen! Bitte ESP und/oder Schulserver prüfen!");
-    }else 
-    {
-      Serial.println("OK");
-      Serial.println("Setze RTC");
-      rtc.setTime(result[0], result[1], result[2]);
-    }*/
-
     Serial.println("Beginne mit Selbsttest... Bitte warten");
     clock.testClock();
     Serial.println("Selbsttest abgeschlossen");
@@ -90,6 +86,19 @@ void loop()
         clock.setTime(t.hour, t.min, t.sec);
         clock.render(!synced);
         syncSeconds--;
+
+        for(int i = 0; i<DIMENSION; i++)
+        {
+          //Serial.println(greenTimes[0] >= t.hour);
+          if((t.hour * 60 + t.min) >= (greenTime[i][0] * 60 + greenTime[i][1]) && (t.hour * 60 + t.min) <= (greenTime[i][2] * 60 + greenTime[i][3]))
+          {
+            Serial.println("Es ist Pause ;)");
+             digitalWrite(4, HIGH);
+             break;
+          }else {
+                digitalWrite(4, LOW);
+          }
+        }
     }
 
     int taste = rotary.getTaste();
