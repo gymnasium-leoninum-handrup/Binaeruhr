@@ -23,6 +23,12 @@ void Clock::setTime(int hours, int minutes, int seconds)
   this->seconds = seconds;
 }
 
+void serialFlush(){
+  while(Serial.available() > 0) {
+    char t = Serial.read();
+  }
+}  
+
 int* Clock::getESPTime()
 {
   int* times = new int[3];
@@ -54,10 +60,12 @@ int* Clock::getESPTime()
     delay(50); // esp cooldown
 
     esp->println("AT+CIPSNTPTIME?");
-    String x = esp->readStringUntil("OK");
-    Serial.println(x);
-
-    String* result = oe::splitme(oe::splitme(oe::splitme(x, "\r\n")[2], " ")[3], ":");
+    esp->readStringUntil('\n');
+    esp->readStringUntil('\n');
+    String zweiteZeile = esp->readStringUntil("\n");
+    String uhrZeitString = oe::splitme(zweiteZeile, " ")[3];
+    String* result = oe::splitme(uhrZeitString, ":");
+    serialFlush();
 
     Serial.print("Stunden: ");
     Serial.println(result[0]);
