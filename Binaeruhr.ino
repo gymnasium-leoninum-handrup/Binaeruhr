@@ -21,6 +21,9 @@
 #define rotaryS2 6
 #define rotaryS1 5
 
+#define NormalSyncSeconds 43200 // 12 Stunden
+#define NotSyncedSyncSeconds 300 // 5 Minuten 
+
 DS3231 rtc(SDA, SCL);
 Time t;
 int seconds;
@@ -44,8 +47,12 @@ void setup()
     Serial.println("Serielle Verbindung hergestellt. Guten Tag!");
     Serial.println("Initialisiere RTC...");
     rtc.begin(); // init rtc connection
+    Serial.println("Lese letzte Uhrzeit...");
+    t = rtc.getTime();
+    clock.setTime(t.hour, t.min, t.sec);
+    clock.render(!synced);
     Serial.println("Beginne mit Selbsttest... Bitte warten");
-    clock.testClock();
+  //  clock.testClock();
     Serial.println("Selbsttest abgeschlossen");
 }
 
@@ -55,21 +62,22 @@ void loop()
     if(syncSeconds == 0) 
     {
       Serial.println("Versuche, Zeit vom Schulserver über ESP8266 zu lesen...");
-      int* result = clock.getESPTime();
+      int* result = clock.getESPTime([&rtc, &clock]() {     
+        });
       Serial.print(result[0]);
             Serial.print(result[1]);
                   Serial.println(result[2]);
       if(result == NULL)
       {
         Serial.println("Konnte Uhrzeit übers Schulnetz nicht lesen! Bitte ESP und/oder Schulserver prüfen!");
-        syncSeconds = 600;
+        syncSeconds = NotSyncedSyncSeconds;
         synced = false;
       }else 
       {
       //  Serial.println("OK");
         //Serial.println("Setze RTC");
         rtc.setTime(result[0], result[1], result[2]);
-        syncSeconds = 21600;
+        syncSeconds = NormalSyncSeconds;
         synced = true;
       }      
     }

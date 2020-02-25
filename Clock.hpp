@@ -7,6 +7,7 @@
 #include "Rotary.hpp"
 #include <DS3231.h>
 #include <SoftwareSerial.h>
+typedef void (*func)(void);
 
 class Clock
 {
@@ -25,7 +26,7 @@ public:
   void render(bool dots = false);
   void testClock();
   void setTimeEncoder(RotaryEncoder *rotary,DS3231 *rtc);
-  int* getESPTime();
+  int* getESPTime(func fun = NULL);
 };
 
 #endif
